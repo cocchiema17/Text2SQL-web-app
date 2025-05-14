@@ -1,0 +1,70 @@
+services:
+
+  mariadb:
+    image: mariadb:11.1
+    environment:
+      MARIADB_USER: user
+      MARIADB_PASSWORD: userpwd
+      MARIADB_ROOT_PASSWORD: MySQL
+      MARIADB_DATABASE: movie_catalog
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mariadb_data:/var/lib/mysql:Z
+      - ./mariadb_init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "-uuser", "-puserpwd", "ping", "-h", "localhost"]
+      start_period: 0s
+      interval: 60s
+      timeout: 3s 
+      retries: 2
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      - DB_USER=user
+      - DB_PASSWORD=userpwd
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_NAME=movie_catalog
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/docs"]
+      start_period: 0s
+      interval: 60s
+      timeout: 3s
+      retries: 2
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - API_BASE_URL=http://backend:8003
+    depends_on:
+      backend:
+        condition: service_healthy
+
+# Serve per caricare i dati da un file TSV al database
+  load_db:
+    build:
+      context: .
+      dockerfile: Dockerfile.load
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - ./data.tsv:/app/data.tsv
+    environment:
+      - MARIADB_HOST=mariadb
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=userpwd
+      - MARIADB_DB=movie_catalog

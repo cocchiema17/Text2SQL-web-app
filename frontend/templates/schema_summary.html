@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Schema summary</title>
+    </head>
+    <body>
+        <h1>Ecco lo schema del mio database</h1>
+        {% for row in schema_summary %}
+            <p>{{ row }}</p>
+        {% endfor %}
+        <a href="/">Torna alla pagina principale</a>
+    </body>
+</html>

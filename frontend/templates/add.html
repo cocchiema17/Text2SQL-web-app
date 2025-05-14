@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Add</title>
+    </head>
+    <body>
+        <h1>Inserisci un nuovo record al database</h1>
+        <br><br>
+        <form method="post" action="/add">
+            <label for="data_line">Inserisci qui:</label>
+            <input type="text" id="data_line" name="data_line" placeholder="Inserisci..." size="60" required>
+            <button type="submit">Aggiungi</button>
+        </form>
+        <br><br>
+        {% if error %}
+            <div style="color: red; font-weight: bold; margin: 1em 0;">
+                {{ error }}
+            </div>
+        {% endif %}
+        <br><br>
+        <a href="/">Torna alla pagina principale</a>
+    </body>
+</html>

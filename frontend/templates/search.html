@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Search</title>
+    </head>
+    <body>
+        <h1>Ecco lo risposta</h1>
+
+        {% if search_results %}
+            <ul>
+                {% for item in search_results %}
+                    <li>
+                        <strong>{{ item.item_type }}</strong>:
+                        <ul>
+                            {% for prop in item.properties %}
+                                <li>{{ prop.property_name }}: {{ prop.property_value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if not error %}
+                <p>Nessun risultato trovato.</p>
+            {% endif %}
+        {% endif %}
+
+        <a href="/">Torna alla pagina principale</a>
+    </body>
+</html>

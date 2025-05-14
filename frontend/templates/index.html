@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Index</title>
+    </head>
+    <body>
+        <h1>Benvenuto in Index</h1>
+        <p>Questa è la pagina principale.</p>
+        <a href="/schema_summary">Schema del database</a>
+        <br><br>
+        <a href="/add">Aggiungi un record al database</a>
+        <br><br>
+        <form method="get" action="/search">
+            <label for="search_request">Cerca:</label>
+            <input type="text" id="search_request" name="search_request" placeholder="Cerca..." size="60" required>
+            <button type="submit">Cerca</button>
+        </form>
+        {% if error %}
+            <br><br>
+            <div style="color: red; font-weight: bold; margin: 1em 0;">
+                {{ error }}
+            </div>
+        {% endif %}
+        <br><br>
+        {% if status == "ok"%}
+        <div style="color: green; font-weight: bold; margin: 1em 0;">
+            Dati aggiunti con successo!
+        </div>
+        {% endif %}
+    </body>
+</html>
