@@ -2,6 +2,7 @@ services:
 
   mariadb:
     image: mariadb:11.1
+    container_name: mariadb_container
     environment:
       MARIADB_USER: user
       MARIADB_PASSWORD: userpwd
@@ -20,6 +21,7 @@ services:
       retries: 2
 
   backend:
+    container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -42,6 +44,7 @@ services:
       retries: 2
 
   frontend:
+    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -55,6 +58,7 @@ services:
 
 # Serve per caricare i dati da un file TSV al database
   load_db:
+    container_name: load_db
     build:
       context: .
       dockerfile: Dockerfile.load

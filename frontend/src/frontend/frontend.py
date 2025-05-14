@@ -91,13 +91,17 @@ def add_page(request: Request):
 
 
 @app.post("/add")
-def add(request: Request, data_line: str = Form(...)):
+def add(request: Request, title: str = Form(...), director: str = Form(...), age: int = Form(...), year: int = Form(...), genre: str = Form(...), platform1: str = Form(...), platform2: str = Form(...)):
     """
     Questa funzione gestisce la richiesta per aggiungere un nuovo film al database.
-    Prende in input una stringa di dati, verifica se il formato è corretto e chiama l'API per aggiungere il film.
+    Prende in input una serie di dati, li sistema nel formato corretto e chiama l'API per aggiungere il film.
     Se si verifica un errore durante la chiamata all'API, restituisce un messaggio di errore.
     """
-    print(data_line)
+    print("Add request:", title, director, age, year, genre, platform1, platform2)
+
+    data_line: str = f"{title},{director},{age},{year},{genre},{platform1},{platform2}"
+    print("Data line:", data_line)
+
     # Verifica se l'input è corretto con l'espressione regolare
     pattern: str = r'^([^,]+),([^,]+),(\d{1,3}),(\d{4}),([^,]+),([^,]*),([^,]*)$'
     match: Match[str] = re.fullmatch(pattern, data_line)
@@ -137,5 +141,5 @@ def add(request: Request, data_line: str = Form(...)):
     else:
         return templates.TemplateResponse("add.html", {
             "request": request,
-            "error": "Formato della stringa non valido. Formato corretto Titolo*,Regista*,Età_autore*,Anno*,Genere*,Piattaforma1,Piataforma2 (* = obbligatorio)"
+            "error": "Si è verificato un errore nell'inserimento dei dati. Assicurati che i dati siano inseriti correttamente."
         })
