@@ -44,7 +44,7 @@ def search(search_request: str) -> List[SearchResponse]:
     Se l'input non è come se l'aspetta, lancia un'eccezione 422 con un messaggio di errore.
     """
     query: str = search_request
-    print("Query:", query)
+    print("Query:", query, flush=True)
     cm: ConnectionManager = ConnectionManager()
 
     # Caso query 1 Elenca i film del <ANNO>.
@@ -55,8 +55,8 @@ def search(search_request: str) -> List[SearchResponse]:
             results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_year(year)
             columns: List[str] = results[0]
             data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns)
-            print("Data from DB:", data)
+            print("Columns from DB:", columns, flush=True)
+            print("Data from DB:", data, flush=True)
             search_response: List[SearchResponse] = [
                 SearchResponse(
                     item_type="film",
@@ -76,8 +76,8 @@ def search(search_request: str) -> List[SearchResponse]:
             results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_directors_by_platform()
             columns: List[str] = results[0]
             data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns)
-            print("Data from DB:", data)
+            print("Columns from DB:", columns, flush=True)
+            print("Data from DB:", data, flush=True)
             search_response: List[SearchResponse] = [
                 SearchResponse(
                     item_type="director",
@@ -97,8 +97,8 @@ def search(search_request: str) -> List[SearchResponse]:
             results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_genre()
             columns: List[str] = results[0]
             data: List[Tuple[str, str, str, str]] = results[1]
-            print("Columns from DB:", columns)
-            print("Data from DB:", data)
+            print("Columns from DB:", columns, flush=True)
+            print("Data from DB:", data, flush=True)
             search_response: List[SearchResponse] = [
                 SearchResponse(
                     item_type="film",
@@ -121,8 +121,8 @@ def search(search_request: str) -> List[SearchResponse]:
             results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_director_age(age)
             columns: List[str] = results[0]
             data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns)
-            print("Data from DB:", data)
+            print("Columns from DB:", columns, flush=True)
+            print("Data from DB:", data, flush=True)
             search_response: List[SearchResponse] = [
                 SearchResponse(
                     item_type="film",
@@ -142,8 +142,8 @@ def search(search_request: str) -> List[SearchResponse]:
             results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_directors_with_films()
             columns: List[str] = results[0]
             data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns)
-            print("Data from DB:", data)
+            print("Columns from DB:", columns, flush=True)
+            print("Data from DB:", data, flush=True)
             search_response: List[SearchResponse] = [
                 SearchResponse(
                     item_type="director",
@@ -196,7 +196,7 @@ def add(add_request: AddRequest) -> AddResponse:
     Se l'input non è come se l'aspetta, lancia un'eccezione 422 con un messaggio di errore.
     """
     data_line: str = add_request.data_line
-    print(f"Dataline:", data_line)
+    print(f"Dataline:", data_line, flush=True)
 
     cm: ConnectionManager = ConnectionManager()
 
@@ -206,7 +206,7 @@ def add(add_request: AddRequest) -> AddResponse:
 
     if match:
         split_data: List[str] = data_line.split(",")
-        print("Split data:", split_data)
+        print("Split data:", split_data, flush=True)
 
         title: str = split_data[0]
         director: str = split_data[1]
@@ -215,15 +215,15 @@ def add(add_request: AddRequest) -> AddResponse:
         genre: str = split_data[4]
         platform1: str = split_data[5] if split_data[5] != "" else None
         platform2: str = split_data[6] if split_data[6] != "" else None
-        print(f"Title: {title}, Director: {director}, Age: {age}, Year: {year}, Genre: {genre}, Platform1: {platform1}, Platform2: {platform2}")
+        print(f"Title: {title}, Director: {director}, Age: {age}, Year: {year}, Genre: {genre}, Platform1: {platform1}, Platform2: {platform2}", flush=True)
 
         
         id_director: int = cm.get_or_create_director(director, age)
-        print(f"ID Director: {id_director}")
+        print(f"ID Director: {id_director}", flush=True)
         id_platform1: int = cm.get_or_create_platform(platform1) if platform1 else None
-        print(f"ID Platform1: {id_platform1}")
+        print(f"ID Platform1: {id_platform1}", flush=True)
         id_platform2: int = cm.get_or_create_platform(platform2) if platform2 else None
-        print(f"ID Platform2: {id_platform2}")
+        print(f"ID Platform2: {id_platform2}", flush=True)
 
         id_movie: int = cm.get_or_create_movie(title, year, genre, id_director, id_platform1, id_platform2) 
         print(f"ID Movie: {id_movie}")

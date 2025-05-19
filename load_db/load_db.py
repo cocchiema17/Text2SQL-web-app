@@ -89,7 +89,7 @@ def main():
             reader = csv.reader(tsvfile, delimiter='\t')
             next(reader) # Salta l'intestazione
             for row in reader:
-                print(row)
+                print(row, flush=True)
                 title = row[0].strip()
                 director = row[1].strip()
                 director_age = int(row[2].strip())

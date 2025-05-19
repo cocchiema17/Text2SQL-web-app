@@ -24,7 +24,7 @@ class ConnectionManager:
                 database=os.getenv("DB_NAME", "movie_catalog")
             )
             self.cursor = self.connection.cursor()
-            print("Database connection established.")
+            print("Database connection established.", flush=True)
         except mariadb.Error as e:
             print(f"Error connecting to MariaDB Platform: {e}")
             raise
@@ -37,7 +37,7 @@ class ConnectionManager:
             self.cursor.close()
         if self.connection:
             self.connection.close()
-            print("Database connection closed.")
+            print("Database connection closed.", flush=True)
 
 # ---------------------------------------------------------- QUERY ENDPOINT /search ---------------------------------------------------
 
@@ -53,7 +53,7 @@ class ConnectionManager:
                 self.cursor.execute(query, [year])
                 # Ciclo per ottenere l'intestazione della query
                 columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns)
+                print("Intestazione della query:", columns, flush=True)
                 results: List[Tuple[str, str, str]] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)
@@ -82,7 +82,7 @@ class ConnectionManager:
                 """
                 self.cursor.execute(query, [platform])
                 columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns)
+                print("Intestazione della query:", columns, flush=True)
                 results: List[Tuple[str, str, str]] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)
@@ -111,7 +111,7 @@ class ConnectionManager:
                 """
                 self.cursor.execute(query, [genre])
                 columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns)
+                print("Intestazione della query:", columns, flush=True)
                 results: List[Tuple[str, str, str, str]] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)
@@ -140,7 +140,7 @@ class ConnectionManager:
                 """
                 self.cursor.execute(query, [age])
                 columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns)
+                print("Intestazione della query:", columns, flush=True)
                 results: List[Tuple[str, str, str]] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)
@@ -170,7 +170,7 @@ class ConnectionManager:
                 """
                 self.cursor.execute(query)
                 columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns)
+                print("Intestazione della query:", columns, flush=True)
                 results: List[Tuple[str, str, str]] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)

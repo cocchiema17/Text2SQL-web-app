@@ -42,7 +42,7 @@ def search(request: Request, search_request: str):
     Prende in input una stringa di ricerca, chiama l'API per ottenere i risultati e restituisce la pagina con i risultati in search.html.
     Se si verifica un errore durante la chiamata all'API, restituisce un messaggio di errore.
     """
-    print("Search request:", search_request)
+    print("Search request:", search_request, flush=True)
     try:
         # Serve per codificare i caratteri speciali nell'URL come ?
         encoded_search_request = urllib.parse.quote(search_request, safe='')    
@@ -97,17 +97,17 @@ def add(request: Request, title: str = Form(...), director: str = Form(...), age
     Prende in input una serie di dati, li sistema nel formato corretto e chiama l'API per aggiungere il film.
     Se si verifica un errore durante la chiamata all'API, restituisce un messaggio di errore.
     """
-    print("Add request:", title, director, age, year, genre, platform1, platform2)
+    print("Add request:", title, director, age, year, genre, platform1, platform2, flush=True)
 
     data_line: str = f"{title},{director},{age},{year},{genre},{platform1},{platform2}"
-    print("Data line:", data_line)
+    print("Data line:", data_line, flush=True)
 
     # Verifica se l'input è corretto con l'espressione regolare
     pattern: str = r'^([^,]+),([^,]+),(\d{1,3}),(\d{4}),([^,]+),([^,]*),([^,]*)$'
     match: Match[str] = re.fullmatch(pattern, data_line)
 
     if match:
-        print("Match")
+        print("Match", flush=True)
         data: Dict[str, str] = {
             "data_line": data_line
         }
