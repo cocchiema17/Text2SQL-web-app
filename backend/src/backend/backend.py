@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from typing import List, Tuple
 from connection_manager import ConnectionManager
-from models import Property, SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse
+from models import Property, SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse,SearchRequest
 import re
 from re import Match
 
@@ -15,7 +15,6 @@ Questi sono gli endpoint principali:
 """
 
 app = FastAPI()
-
 # questa lista serve per il mesaggio di errore quando la search non è valida
 search_queries: List[str] = [
     "Elenca i film del <ANNO>.",
@@ -26,6 +25,10 @@ search_queries: List[str] = [
 ]
 
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
+#BASE_MODEL="gemma3:1b-it-qat"
+@app.post("/search")
+def search(search_request: SearchRequest) -> List[SearchResponse]:
+    pass
 
 @app.get("/search/{search_request}")   
 def search(search_request: str) -> List[SearchResponse]:

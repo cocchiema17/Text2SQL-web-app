@@ -10,9 +10,17 @@ class Property(BaseModel):
     property_name: str
     property_value: str
 
+class SearchRequest(BaseModel):
+    question:str
+    model:str
+
 class SearchResponse(BaseModel):
-    item_type: str
-    properties: List[Property]
+    sql:str
+    sql_validation:str
+    results:List[Property]
+    #Campi dell'esonero
+    #item_type: str
+    #properties: List[Property]
 
 class DatabaseSchemaResponse(BaseModel):
     table_name: str
