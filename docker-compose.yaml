@@ -60,13 +60,13 @@ services:
   load_db:
     container_name: load_db
     build:
-      context: .
-      dockerfile: Dockerfile.load
+      context: ./load_db
+      dockerfile: Dockerfile
     depends_on:
       mariadb:
         condition: service_healthy
     volumes:
-      - ./data.tsv:/app/data.tsv
+      - ./load_db/data.tsv:/app/data.tsv
     environment:
       - MARIADB_HOST=mariadb
       - MARIADB_USER=user
