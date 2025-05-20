@@ -32,13 +32,17 @@ class ModelController:
         schema_summary_str = "\n".join([f"{table_name}: {columns}" for table_name, columns in schema_summary])
         print(f"Schema summary string: {schema_summary_str}", flush=True)
 
-        final_question: str = "Trasforma la seguente domanda in una query SQL:\n"
-        final_question += f"Schema del database:\n{schema_summary_str}\n"
-        final_question += "id_directors è chiave esterna da directors(id)\nid_platform1 è chiave esterna da platform(id)\nid_platform1 è chiave esterna da platform(id)\n"
-        final_question += "Domanda:\n"
-        final_question += f"{question}\n"
-        final_question += "rispondimi solo con la query SQL, senza spiegazioni o altro testo."
-        print(f"Final question: {final_question}", flush=True)
+        final_question: str = (
+            "Sei un assistente che trasforma domande in linguaggio naturale in query SQL valide per un database relazionale.\n\n"
+            "Schema del database:\n"
+            f"{schema_summary_str}\n\n"
+            "Relazioni:\n"
+            "id_directors è chiave esterna da directors(id)\n"
+            "id_platform1 è chiave esterna da platform(id)\n"
+            "id_platform2 è chiave esterna da platform(id)\n\n"
+            f"Domanda: {question}\n\n"
+            "Genera **solo** la query SQL, **senza spiegazioni, testo aggiuntivo o formattazione extra**."
+        )
 
         model_request: ModelRequest = ModelRequest(
             model=self.model,
