@@ -5,7 +5,7 @@ from models import Property,SQLSearchRequest,SearchResponse, DatabaseSchemaRespo
 import re
 from re import Match
 import os
-from text_to_sql.model_controller import ModelController
+from model_controller import ModelController
 
 """
 Questo file contiene il codice del server backend FastAPI che gestisce le richieste HTTP e l''interazione con il database attraverso la 

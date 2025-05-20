@@ -9,8 +9,13 @@ RUN apt-get update && apt-get install -y gcc g++ libmariadb-dev
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 
-COPY src/backend /app
-COPY requirements.txt /app
+COPY text_to_sql/src /app
+COPY text_to_sql/requirements.txt /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/src/backend /app
+COPY backend/requirements.txt /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 

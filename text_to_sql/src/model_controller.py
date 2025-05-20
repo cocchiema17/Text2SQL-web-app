@@ -1,5 +1,5 @@
 import requests
-from backend.src.backend.models import Question, ModelRequest, ModelResponse, ModelPullRequest
+from models import Question, ModelRequest, ModelResponse, ModelPullRequest
 
 class ModelController:
     def __init__(self, api_url: str):
