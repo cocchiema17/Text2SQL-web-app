@@ -34,9 +34,10 @@ class ModelController:
 
         final_question: str = "Trasforma la seguente domanda in una query SQL:\n"
         final_question += f"Schema del database:\n{schema_summary_str}\n"
+        final_question += "id_directors è chiave esterna da directors(id)\nid_platform1 è chiave esterna da platform(id)\nid_platform1 è chiave esterna da platform(id)\n"
         final_question += "Domanda:\n"
         final_question += f"{question}\n"
-        final_question += "rispondimi solo con la query SQL, senza spiegazioni o altro testo.\n"
+        final_question += "rispondimi solo con la query SQL, senza spiegazioni o altro testo."
         print(f"Final question: {final_question}", flush=True)
 
         model_request: ModelRequest = ModelRequest(

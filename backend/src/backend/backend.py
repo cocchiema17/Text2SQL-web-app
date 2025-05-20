@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from typing import List, Tuple
 from connection_manager import ConnectionManager
-from models import Property,SQLSearchRequest,SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse,SearchRequest
+from models import *
 import re
 from re import Match
 import os
@@ -47,47 +47,46 @@ def search(search_request: SearchRequest) -> SearchResponse:
 
     # Verifica se la query è valida
     # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
-    # sql_validation: str = cm.sql_validation(query)
+    sql_validation: str = cm.sql_validation(query)
 
     # se la query è "valid" allora si esegue la query
     # fare metodo che esegue la query e restituisce i risultati
-    # results: ? = cm.execute_query(query)
+    if sql_validation == "valid":
+        results: Tuple[List[str], List[Tuple]] = cm.execute_query(query)
+        columns: List[str] = results[0]
+        data: List[Tuple[str, str, str]] = results[1]
+        print("Columns from DB:", columns, flush=True)
+        print("Data from DB:", data, flush=True)
 
     # fare metodo che restituisce il tipo di oggetto (film, regista o piattaforma) in base alla query
     # item_type: str = cm.get_item_type(query) 
 
-    # search_response: SearchResponse = SearchResponse(
-    #     sql=query,
-    #     sql_validation=sql_validation,
-    #     results=SearchResult(
-    #         item_type=item_type,
-    #         properties=[
-    #             Property(property_name=columns[i], property_value=str(row[i]))
-    #             for i in range(len(columns))
-    #         ]
-    #         for row in results
-    #     )
-    # )
-    # return search_response
+        search_response: SearchResponse = SearchResponse(
+            sql=query,
+            sql_validation=sql_validation,
+            results= [
+                SearchResult(
+                    item_type="film",   # o "director" o "platform" (da modificare)
+                    properties=[
+                        Property(property_name=columns[i], property_value=str(row[i]))
+                        for i in range(len(columns))
+                    ]    
+                )
+                for row in data
+                ]
+            )
+        return search_response
     
-   
-
-
-    #Dobbiamo permettere solo richieste SELECT
-    #first_word = sql.split(" ")[0]
-    #if first_word != "SELECT":
-    #   raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
+    # se la query è "unsafe" allora si restituisce un errore
+    elif sql_validation == "unsafe":
+        raise HTTPException(status_code=422, detail="Unsafe query. Please check your SQL syntax.")
+    # se la query è "invalid" allora si restituisce un errore
+    elif sql_validation == "invalid":
+        raise HTTPException(status_code=422, detail="Invalid query. Please check your SQL syntax.")
+    else:
+        raise HTTPException(status_code=422, detail="Unknown error. Please check your SQL syntax.")
     
-    #dopo la select sql_validation è per forza valid
-    #invalid se non è stato possibile eseguirlo con succeso
-    pass
-
-"""
-def sql_validation(sql:str)->(str,Optional[List[Any]]):
-    first_word= sql.split(" ").strip()
-    if first_word != "SELECT":
-        pass
-"""
+# ---------------------------------------------------------- ENDPOINT /sql_search ---------------------------------------------------
 
 @app.post("/sql_search")
 def sql_search(search_request: SQLSearchRequest):
@@ -103,146 +102,6 @@ def sql_search(search_request: SQLSearchRequest):
         sql_validation="unsafe"
         return sql_validation,results
 
-
-"""
-@app.get("/search/{search_request}")   
-def search(search_request: str) -> List[SearchResponse]:
-"""
-"""
-    Questo metodo si aspetta delle stringhe esatte ossia:
-    Elenca i film del <ANNO>.
-    Quali sono i registi presenti su Netflix?
-    Elenca tutti i film di fantascienza.
-    Quali film sono stati fatti da un regista di almeno <ANNI> anni?
-    Quali registi hanno fatto più di un film?
-
-    Fa il parsing di <ANNO> e <ANNI> e fa il controllo che siano numeri interi, <ANNO> con 4 cifre e <ANNI> con 1-3 cifre.
-    Il parsing delle stringhe è fatto con le espressioni regolari.
-    Se l'input è corretto, chiama il metodo appropriato della classe ConnectionManager per eseguire la query sul database.
-    Restituisce una lista di oggetti SearchResponse, che contengono le proprietà dei film o dei registi trovati.
-    Se l'input non è come se l'aspetta, lancia un'eccezione 422 con un messaggio di errore.
-    """
-"""
-    query: str = search_request
-    print("Query:", query, flush=True)
-    cm: ConnectionManager = ConnectionManager()
-
-    # Caso query 1 Elenca i film del <ANNO>.
-    match: Match[str] = re.fullmatch(r"Elenca i film del (\d{4})\.", query)
-    if match:
-        year: int = int(match.group(1))
-        try:
-            results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_year(year)
-            columns: List[str] = results[0]
-            data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns, flush=True)
-            print("Data from DB:", data, flush=True)
-            search_response: List[SearchResponse] = [
-                SearchResponse(
-                    item_type="film",
-                    properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
-                        for i in range(len(columns))
-                    ]
-                ) for row in data
-            ]
-            return search_response
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching movies by year: {e}")
-        
-    # Caso query 2 Quali sono i registi presenti su Netflix?
-    elif query == "Quali sono i registi presenti su Netflix?":
-        try:
-            results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_directors_by_platform()
-            columns: List[str] = results[0]
-            data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns, flush=True)
-            print("Data from DB:", data, flush=True)
-            search_response: List[SearchResponse] = [
-                SearchResponse(
-                    item_type="director",
-                    properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
-                        for i in range(len(columns))
-                    ]
-                ) for row in data
-            ]
-            return search_response
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching directors: {e}")
-        
-    # Caso query 3 Elenca tutti i film di fantascienza.
-    elif query == "Elenca tutti i film di fantascienza.":
-        try:
-            results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_genre()
-            columns: List[str] = results[0]
-            data: List[Tuple[str, str, str, str]] = results[1]
-            print("Columns from DB:", columns, flush=True)
-            print("Data from DB:", data, flush=True)
-            search_response: List[SearchResponse] = [
-                SearchResponse(
-                    item_type="film",
-                    properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
-                        for i in range(len(columns))
-                    ]
-                ) for row in data
-            ]
-            return search_response
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching directors: {e}")
-        
-    # Caso query 4 Quali film sono stati fatti da un regista di almeno <ANNI> anni?
-    match: Match[str] = re.fullmatch(r"Quali film sono stati fatti da un regista di almeno (\d{1,3}) anni\?", query)
-    if match:
-        age: int = int(match.group(1))
-        print("Age:", age)
-        try:
-            results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_movies_by_director_age(age)
-            columns: List[str] = results[0]
-            data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns, flush=True)
-            print("Data from DB:", data, flush=True)
-            search_response: List[SearchResponse] = [
-                SearchResponse(
-                    item_type="film",
-                    properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
-                        for i in range(len(columns))
-                    ]
-                ) for row in data
-            ]
-            return search_response
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching movies by year: {e}")
-        
-    # Caso query 5 Quali registi hanno fatto più di un film?
-    elif query == "Quali registi hanno fatto più di un film?":
-        try:
-            results: Tuple[List[str], List[Tuple[str, str, str]]] = cm.query_list_directors_with_films()
-            columns: List[str] = results[0]
-            data: List[Tuple[str, str, str]] = results[1]
-            print("Columns from DB:", columns, flush=True)
-            print("Data from DB:", data, flush=True)
-            search_response: List[SearchResponse] = [
-                SearchResponse(
-                    item_type="director",
-                    properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
-                        for i in range(len(columns))
-                    ]
-                ) for row in data
-            ]
-            return search_response
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching directors: {e}")
-
-    else:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Invalid query format. Expected one of this format: {search_queries}"
-        )
-"""
 
 # ---------------------------------------------------------- ENDPOINT /schema_summary ---------------------------------------------------
 

@@ -2,18 +2,20 @@ Cose da fare:
 
  - modificare enpoint search (backend): 
 	- rendere da get a post (anche frontend)
-	- richiamare file dalla cartella text_to_sql
-	- verificare se la query generata dal modello è valida 
+	- richiamare file dalla cartella text_to_sql # (in teoria non ce n'è bisogno perchè vengono entrambi importati nel backend)
+	- verificare se la query generata dal modello è valida #
+	- fare metodo in connection_manager.py get_item_type
 
  - fare l'endpoint sql_search:
 	- fare lato backend e poi lato frotend
-	- richiamare file dalla cartella text_to_sql
+	- richiamare file dalla cartella text_to_sql # (in teoria non ce n'è bisogno perchè vengono entrambi importati nel backend)
 
  - modificare model_controller.py:
-	- prima di ogni richiesta al modello, alla stringa va integrato lo schema del database, che lo si ottiene chiamando il metodo 		  query_summary all'interno di connection_manager.py
+	- prima di ogni richiesta al modello, alla stringa va integrato lo schema del database, che lo si ottiene chiamando il metodo
+	 query_summary all'interno di connection_manager.py #
 
  - modificare connection_manager.py per soddisfare gli endpoint search e sql_search:
-	- richiamare file dalla cartella text_to_sql
+	- richiamare file dalla cartella text_to_sql # (in teoria non ce n'è bisogno perchè vengono entrambi importati nel backend)
 
 Logica enpoint search e sql_search:
 Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database

@@ -1,6 +1,7 @@
 import mariadb
 import os
 from typing import List, Tuple
+import re
 
 """
 Questo file contiene la classe ConnectionManager, che gestisce la connessione ed esegue le query al database all'interno di MariaDB.
@@ -39,22 +40,48 @@ class ConnectionManager:
             self.connection.close()
             print("Database connection closed.", flush=True)
 
-# ---------------------------------------------------------- QUERY ENDPOINT /search ---------------------------------------------------
+# ---------------------------------------------------------- QUERY ENDPOINT /search e /sql_search ---------------------------------------------------
 
-    def query_list_movies_by_year(self, year: int) -> Tuple[List[str], List[Tuple[str, str, str]]]:
+    def sql_validation(self, sql_query: str) -> str:
         """
-        Questo metodo esegue una query per ottenere un elenco di film in base all'anno fornito.
-        Restituisce una tupla contenente l'intestazione della query e i risultati.
+        Questo metodo esegue una query per validare la sintassi SQL.
+        Restituisce: "valid" se la sintassi è corretta, 
+                    "unsafe" se contiene comandi di modifica (da evitare),
+                    "invalid" se la sintassi è errata.
+        """
+        self.connect()
+        if self.connection and self.cursor:
+            #  una regex per controllare se la query inizia con SELECT, ignorando spazi e commenti.
+            if re.match(r'^\s*select\b', sql_query, re.IGNORECASE):
+                try:
+                    # Eseguiamo la query per validare la sintassi SQL
+                    self.cursor.execute(sql_query)
+                    return "valid"
+                except mariadb.Error as e:
+                    # Se la sintassi è errata, restituiamo "invalid"
+                    if "syntax error" in str(e):
+                        return "invalid"
+                    else:
+                        print(f"Error executing query: {e}")
+                        raise
+                finally:
+                    self.close()
+            else:
+                # Se la query non è una SELECT, restituiamo "unsafe"
+                self.close()
+                return "unsafe"
+            
+    def execute_query(self, sql_query: str) -> Tuple[List[str], List[Tuple]]:
+        """
+        Questo metodo esegue una query SQL e restituisce i risultati e i nomi delle colonne.
         """
         self.connect()
         if self.connection and self.cursor:
             try:
-                query: str = "SELECT id, title as name, year FROM movies WHERE year = ?"
-                self.cursor.execute(query, [year])
-                # Ciclo per ottenere l'intestazione della query
+                self.cursor.execute(sql_query)
                 columns: List[str] = [description[0] for description in self.cursor.description]
                 print("Intestazione della query:", columns, flush=True)
-                results: List[Tuple[str, str, str]] = self.cursor.fetchall()
+                results: List[Tuple] = self.cursor.fetchall()
                 self.connection.commit()
                 return (columns, results)
             except mariadb.Error as e:
@@ -66,123 +93,7 @@ class ConnectionManager:
         else:
             print("Connection not established. Cannot execute query.")
             raise Exception("Connection not established.")
-        
-    def query_list_directors_by_platform(self, platform: str = 'Netflix') -> Tuple[List[str], List[Tuple[str, str, str]]]:
-        """
-        Questo metodo esegue una query per ottenere un elenco di registi in base alla piattaforma fornita, 'Netflix' di default.
-        Restituisce una tupla contenente l'intestazione della query e i risultati.
-        """
-        self.connect()
-        if self.connection and self.cursor:
-            try:
-                query: str = """
-                SELECT DISTINCT d.id, d.name, p.name 
-                FROM movies m JOIN directors d ON m.id_director = d.id JOIN platforms p ON p.id IN (m.id_platform1, m.id_platform2)
-                WHERE p.name = ?
-                """
-                self.cursor.execute(query, [platform])
-                columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns, flush=True)
-                results: List[Tuple[str, str, str]] = self.cursor.fetchall()
-                self.connection.commit()
-                return (columns, results)
-            except mariadb.Error as e:
-                self.connection.rollback()
-                print(f"Error executing query: {e}")
-                raise
-            finally:
-                self.close()
-        else:
-            print("Connection not established. Cannot execute query.")
-            raise Exception("Connection not established.")
-        
-    def query_list_movies_by_genre(self, genre: str = 'Fantascienza') -> Tuple[List[str], List[Tuple[str, str, str, str]]]:
-        """
-        Questo metodo esegue una query per ottenere un elenco di film in base al genere fornito, 'Fantascienza' di default.
-        Restituisce una tupla contenente l'intestazione della query e i risultati.
-        """
-        self.connect()
-        if self.connection and self.cursor:
-            try:
-                query: str = """
-                SELECT DISTINCT id, title as name, year, genre
-                FROM movies
-                WHERE genre = ?
-                """
-                self.cursor.execute(query, [genre])
-                columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns, flush=True)
-                results: List[Tuple[str, str, str, str]] = self.cursor.fetchall()
-                self.connection.commit()
-                return (columns, results)
-            except mariadb.Error as e:
-                self.connection.rollback()
-                print(f"Error executing query: {e}")
-                raise
-            finally:
-                self.close()
-        else:
-            print("Connection not established. Cannot execute query.")
-            raise Exception("Connection not established.")
-        
-    def query_list_movies_by_director_age(self, age: int) -> Tuple[List[str], List[Tuple[str, str, str]]]:
-        """
-        Questo metodo esegue una query per ottenere un elenco di film in base all'età del regista fornita.
-        Restituisce una tupla contenente l'intestazione della query e i risultati.
-        """
-        self.connect()
-        if self.connection and self.cursor:
-            try:
-                query: str = """
-                SELECT DISTINCT m.title as name, d.name, d.age
-                FROM movies m JOIN directors d ON m.id_director = d.id
-                WHERE d.age >= ?
-                """
-                self.cursor.execute(query, [age])
-                columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns, flush=True)
-                results: List[Tuple[str, str, str]] = self.cursor.fetchall()
-                self.connection.commit()
-                return (columns, results)
-            except mariadb.Error as e:
-                self.connection.rollback()
-                print(f"Error executing query: {e}")
-                raise
-            finally:
-                self.close()
-        else:
-            print("Connection not established. Cannot execute query.")
-            raise Exception("Connection not established.")
-        
-    def query_list_directors_with_films(self) -> Tuple[List[str], List[Tuple[str, str, str]]]:
-        """
-        Questo metodo esegue una query per ottenere un elenco di registi con più di un film.
-        Restituisce una tupla contenente l'intestazione della query e i risultati.
-        """
-        self.connect()
-        if self.connection and self.cursor:
-            try:
-                query: str = """
-                SELECT d.id, d.name, COUNT(*) num_movies
-                FROM movies m JOIN directors d ON m.id_director = d.id
-                GROUP BY d.id, d.name
-                HAVING COUNT(*) > 1
-                """
-                self.cursor.execute(query)
-                columns: List[str] = [description[0] for description in self.cursor.description]
-                print("Intestazione della query:", columns, flush=True)
-                results: List[Tuple[str, str, str]] = self.cursor.fetchall()
-                self.connection.commit()
-                return (columns, results)
-            except mariadb.Error as e:
-                self.connection.rollback()
-                print(f"Error executing query: {e}")
-                raise
-            finally:
-                self.close()
-        else:
-            print("Connection not established. Cannot execute query.")
-            raise Exception("Connection not established.")
+
 
 # ---------------------------------------------------------- QUERY ENDPOINT /schema_summary ---------------------------------------------------
 

@@ -23,7 +23,7 @@ class SearchRequest(BaseModel):
 class SearchResponse(BaseModel):
     sql: str
     sql_validation: str
-    results: SearchResult
+    results: List[SearchResult]
   
 
 # ---------------------------------------------------------- MODELLI ENDPOINT /sql_search ---------------------------------------------------
