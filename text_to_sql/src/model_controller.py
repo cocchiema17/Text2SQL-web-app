@@ -1,5 +1,7 @@
 import requests
 from models import Question, ModelRequest, ModelResponse, ModelPullRequest
+from connection_manager import ConnectionManager
+from typing import List, Tuple
 
 class ModelController:
     def __init__(self, api_url: str):
@@ -23,13 +25,24 @@ class ModelController:
             print(f"Pull failed: {e}")
             return False
 
-    def ask_question(self, question: str) -> str:
-        print(f"Received question from api_server: {question}", flush=True)
+    def ask_question(self, question: str, schema_summary: List[Tuple[str, str]]) -> str:
+        print(f"Received question from backend: {question}", flush=True)
+        print(f"Schema summary: {schema_summary}", flush=True)
+
+        schema_summary_str = "\n".join([f"{table_name}: {columns}" for table_name, columns in schema_summary])
+        print(f"Schema summary string: {schema_summary_str}", flush=True)
+
+        final_question: str = "Trasforma la seguente domanda in una query SQL:\n"
+        final_question += f"Schema del database:\n{schema_summary_str}\n"
+        final_question += "Domanda:\n"
+        final_question += f"{question}\n"
+        final_question += "rispondimi solo con la query SQL, senza spiegazioni o altro testo.\n"
+        print(f"Final question: {final_question}", flush=True)
 
         model_request: ModelRequest = ModelRequest(
-            model="gemma3:1b",
+            model=self.model,
             messages=[
-                Question(role="user", content=question)
+                Question(role="user", content=final_question)
             ],
             stream=False
         )

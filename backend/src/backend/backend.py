@@ -28,18 +28,49 @@ search_queries: List[str] = [
 
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 
-md: ModelController = ModelController(OLLAMA_API_URL)
+mc: ModelController = ModelController(OLLAMA_API_URL)
 # All'inizio del server, il modello viene caricato
-md.pull_model()
+mc.pull_model()
 
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
 @app.post("/search")
-def search(search_request: SearchRequest) -> List[SearchResponse]:
+def search(search_request: SearchRequest) -> SearchResponse:
     if not search_request.question or not search_request.model:
         raise HTTPException(status_code=400, detail="Both 'question' and 'model' fields are required.")
     
-    #implementazione di un sistema textToSql
-    #sql = textToSql( )
+    cm: ConnectionManager = ConnectionManager()
+    schema_summary: List[Tuple[str, str]] = cm.query_schema_summary()
+
+    question: str = search_request.question
+    query: str = mc.ask_question(question, schema_summary)
+    print(f"Query by model: {query}", flush=True)
+
+    # Verifica se la query è valida
+    # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
+    # sql_validation: str = cm.sql_validation(query)
+
+    # se la query è "valid" allora si esegue la query
+    # fare metodo che esegue la query e restituisce i risultati
+    # results: ? = cm.execute_query(query)
+
+    # fare metodo che restituisce il tipo di oggetto (film, regista o piattaforma) in base alla query
+    # item_type: str = cm.get_item_type(query) 
+
+    # search_response: SearchResponse = SearchResponse(
+    #     sql=query,
+    #     sql_validation=sql_validation,
+    #     results=SearchResult(
+    #         item_type=item_type,
+    #         properties=[
+    #             Property(property_name=columns[i], property_value=str(row[i]))
+    #             for i in range(len(columns))
+    #         ]
+    #         for row in results
+    #     )
+    # )
+    # return search_response
+    
+   
 
 
     #Dobbiamo permettere solo richieste SELECT
@@ -73,10 +104,11 @@ def sql_search(search_request: SQLSearchRequest):
         return sql_validation,results
 
 
-
+"""
 @app.get("/search/{search_request}")   
 def search(search_request: str) -> List[SearchResponse]:
-    """
+"""
+"""
     Questo metodo si aspetta delle stringhe esatte ossia:
     Elenca i film del <ANNO>.
     Quali sono i registi presenti su Netflix?
@@ -90,6 +122,7 @@ def search(search_request: str) -> List[SearchResponse]:
     Restituisce una lista di oggetti SearchResponse, che contengono le proprietà dei film o dei registi trovati.
     Se l'input non è come se l'aspetta, lancia un'eccezione 422 con un messaggio di errore.
     """
+"""
     query: str = search_request
     print("Query:", query, flush=True)
     cm: ConnectionManager = ConnectionManager()
@@ -209,6 +242,7 @@ def search(search_request: str) -> List[SearchResponse]:
             status_code=422,
             detail=f"Invalid query format. Expected one of this format: {search_queries}"
         )
+"""
 
 # ---------------------------------------------------------- ENDPOINT /schema_summary ---------------------------------------------------
 
