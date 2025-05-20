@@ -20,6 +20,20 @@ services:
       timeout: 3s 
       retries: 2
 
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      start_period: 0s
+      interval: 60s
+      timeout: 3s
+      retries: 2
+
   backend:
     container_name: backend
     build:
@@ -30,12 +44,15 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
     environment:
       - DB_USER=user
       - DB_PASSWORD=userpwd
       - DB_HOST=mariadb
       - DB_PORT=3306
       - DB_NAME=movie_catalog
+      - OLLAMA_API_URL=http://ollama:11434
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/docs"]
       start_period: 0s

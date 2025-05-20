@@ -4,6 +4,8 @@ from connection_manager import ConnectionManager
 from models import Property,SQLSearchRequest,SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse,SearchRequest
 import re
 from re import Match
+import os
+from text_to_sql.model_controller import ModelController
 
 """
 Questo file contiene il codice del server backend FastAPI che gestisce le richieste HTTP e l''interazione con il database attraverso la 
@@ -24,8 +26,13 @@ search_queries: List[str] = [
     "Quali registi hanno fatto più di un film?"
 ]
 
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+
+md: ModelController = ModelController(OLLAMA_API_URL)
+# All'inizio del server, il modello viene caricato
+md.pull_model()
+
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
-#BASE_MODEL="gemma3:1b-it-qat"
 @app.post("/search")
 def search(search_request: SearchRequest) -> List[SearchResponse]:
     if not search_request.question or not search_request.model:
@@ -44,11 +51,12 @@ def search(search_request: SearchRequest) -> List[SearchResponse]:
     #invalid se non è stato possibile eseguirlo con succeso
     pass
 
-
+"""
 def sql_validation(sql:str)->(str,Optional[List[Any]]):
     first_word= sql.split(" ").strip()
     if first_word != "SELECT":
         pass
+"""
 
 @app.post("/sql_search")
 def sql_search(search_request: SQLSearchRequest):
