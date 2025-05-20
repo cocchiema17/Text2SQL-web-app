@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from typing import List, Tuple
 from connection_manager import ConnectionManager
-from models import Property, SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse,SearchRequest
+from models import Property,SQLSearchRequest,SearchResponse, DatabaseSchemaResponse, AddRequest, AddResponse,SearchRequest
 import re
 from re import Match
 
@@ -28,7 +28,43 @@ search_queries: List[str] = [
 #BASE_MODEL="gemma3:1b-it-qat"
 @app.post("/search")
 def search(search_request: SearchRequest) -> List[SearchResponse]:
+    if not search_request.question or not search_request.model:
+        raise HTTPException(status_code=400, detail="Both 'question' and 'model' fields are required.")
+    
+    #implementazione di un sistema textToSql
+    #sql = textToSql( )
+
+
+    #Dobbiamo permettere solo richieste SELECT
+    #first_word = sql.split(" ")[0]
+    #if first_word != "SELECT":
+    #   raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
+    
+    #dopo la select sql_validation è per forza valid
+    #invalid se non è stato possibile eseguirlo con succeso
     pass
+
+
+def sql_validation(sql:str)->(str,Optional[List[Any]]):
+    first_word= sql.split(" ").strip()
+    if first_word != "SELECT":
+        pass
+
+@app.post("/sql_search")
+def sql_search(search_request: SQLSearchRequest):
+    ##traduzione question to sql
+    sql = search_request.sql_query.strip()
+    
+    #Verifica query valida
+    sql_validation,results = sql_validation(sql)
+
+    #mia soluzione
+    first_word = sql.split(" ")[0]
+    if first_word != "SELECT":
+        sql_validation="unsafe"
+        return sql_validation,results
+
+
 
 @app.get("/search/{search_request}")   
 def search(search_request: str) -> List[SearchResponse]:

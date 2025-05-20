@@ -22,6 +22,11 @@ class SearchResponse(BaseModel):
     #item_type: str
     #properties: List[Property]
 
+#Aggiunta la classe per la sql_search()
+class SQLSearchRequest(BaseModel):
+    sql_query:str
+    model:str
+
 class DatabaseSchemaResponse(BaseModel):
     table_name: str
     table_column: str
