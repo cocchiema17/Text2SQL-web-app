@@ -44,6 +44,8 @@ def search(search_request: SearchRequest) -> SearchResponse:
     question: str = search_request.question
     query: str = mc.ask_question(question, schema_summary)
     print(f"Query by model: {query}", flush=True)
+    query = cm.clean_query(query)
+    print(f"Cleaned query: {query}", flush=True)
 
     # Verifica se la query è valida
     # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager

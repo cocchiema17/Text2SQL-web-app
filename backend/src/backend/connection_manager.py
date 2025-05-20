@@ -2,6 +2,7 @@ import mariadb
 import os
 from typing import List, Tuple
 import re
+import sqlparse
 
 """
 Questo file contiene la classe ConnectionManager, che gestisce la connessione ed esegue le query al database all'interno di MariaDB.
@@ -42,6 +43,12 @@ class ConnectionManager:
 
 # ---------------------------------------------------------- QUERY ENDPOINT /search e /sql_search ---------------------------------------------------
 
+    def clean_sql_output(response: str) -> str:
+        # Rimuove eventuali blocchi di testo prima/dopo la query
+        statements = sqlparse.split(response.strip())
+        return statements[0].strip() if statements else ""
+    
+    
     def sql_validation(self, sql_query: str) -> str:
         """
         Questo metodo esegue una query per validare la sintassi SQL.
@@ -70,6 +77,7 @@ class ConnectionManager:
                 # Se la query non è una SELECT, restituiamo "unsafe"
                 self.close()
                 return "unsafe"
+
             
     def execute_query(self, sql_query: str) -> Tuple[List[str], List[Tuple]]:
         """
