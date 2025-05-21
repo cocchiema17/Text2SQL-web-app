@@ -94,17 +94,52 @@ def search(search_request: SearchRequest) -> SearchResponse:
 
 @app.post("/sql_search")
 def sql_search(search_request: SQLSearchRequest):
-    ##traduzione question to sql
-    sql = search_request.sql_query.strip()
+    if not search_request.sql_query and not search_request.model:
+        raise HTTPException(status_code=400, detail="Both 'question' and 'model' fields are required.")
     
-    #Verifica query valida
-    sql_validation,results = sql_validation(sql)
+    query: str = search_request.sql_query
+    
+    cm: ConnectionManager = ConnectionManager()
+    # Verifica se la query è valida
+    # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
+    sql_validation: str = cm.sql_validation(search_request.sql_query)
 
-    #mia soluzione
-    first_word = sql.split(" ")[0]
-    if first_word != "SELECT":
-        sql_validation="unsafe"
-        return sql_validation,results
+    # se la query è "valid" allora si esegue la query
+    # fare metodo che esegue la query e restituisce i risultati
+    if sql_validation == "valid":
+        results: Tuple[List[str], List[Tuple]] = cm.execute_query(search_request.sql_query)
+        columns: List[str] = results[0]
+        data: List[Tuple[str, str, str]] = results[1]
+        print("Columns from DB:", columns, flush=True)
+        print("Data from DB:", data, flush=True)
+
+    # fare metodo che restituisce il tipo di oggetto (film, regista o piattaforma) in base alla query
+    # item_type: str = cm.get_item_type(query) 
+
+        search_response: SQLSearchResponse = SQLSearchResponse(
+            sql_validation=sql_validation,
+            results= [SearchResult(
+                    item_type="film",   # o "director" o "platform" (da modificare)
+                    properties=[
+                        Property(property_name=columns[i], property_value=str(row[i]))
+                        for i in range(len(columns))
+                    ]    
+                )
+                for row in data
+                ]
+            )
+        return search_response
+    
+     # se la query è "unsafe" allora si restituisce un errore
+    elif sql_validation == "unsafe":
+        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        return search_response
+    # se la query è "invalid" allora si restituisce un errore
+    elif sql_validation == "invalid":
+        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        return search_response
+    else:
+        raise HTTPException(status_code=422, detail="Unknown error. Please check your SQL syntax.")
 
 
 # ---------------------------------------------------------- ENDPOINT /schema_summary ---------------------------------------------------

@@ -7,7 +7,7 @@ Cose da fare:
 	- fare metodo in connection_manager.py get_item_type
 
  - fare l'endpoint sql_search:
-	- fare lato backend e poi lato frotend
+	- fare lato backend e poi lato frotend(nel lato frontend commenta te la funzione)
 	- richiamare file dalla cartella text_to_sql # (in teoria non ce n'è bisogno perchè vengono entrambi importati nel backend)
 
  - modificare model_controller.py:
@@ -18,8 +18,10 @@ Cose da fare:
 	- richiamare file dalla cartella text_to_sql # (in teoria non ce n'è bisogno perchè vengono entrambi importati nel backend)
 
 Logica enpoint search e sql_search:
-Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database
-Risposta: database -> connection_manager (ritorna i risultati se sql_validation è valida) -> backend -> frontend -> utente
+-Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database
+-Risposta: database -> connection_manager (ritorna i risultati se sql_validation è valida) -> backend -> frontend -> utente
 
  - fare pagina sql_search.html e aggiungere il link a index.html (e viceversa)
 
+ -Aggiornare backend - fronted della search e sql_search:
+	-ristrutturare per la gestione degli item_type

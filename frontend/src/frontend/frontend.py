@@ -35,21 +35,23 @@ def index(request: Request):
     """
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/search")
-def search(request: Request, search_request: str):
+@app.post("/search")
+def search(request: Request):
+    pass
+    
+
+@app.post("/sql_search")
+def sql_search(request: Request):
     """
-    Questa funzione gestisce le richieste (specifiche) di ricerca per film o registi.
-    Prende in input una stringa di ricerca, chiama l'API per ottenere i risultati e restituisce la pagina con i risultati in search.html.
-    Se si verifica un errore durante la chiamata all'API, restituisce un messaggio di errore.
+        (fai il commento che ritieni più opportuno)
+
     """
-    print("Search request:", search_request, flush=True)
     try:
-        # Serve per codificare i caratteri speciali nell'URL come ?
-        encoded_search_request = urllib.parse.quote(search_request, safe='')    
-        response = requests.get(f"{API_BASE_URL}/search/{encoded_search_request}")
+        response = requests.post(f"{API_BASE_URL}/sql_search")
         response.raise_for_status()
-        search_results = response.json()
-        return templates.TemplateResponse("search.html", {"request": request, "search_results": search_results})
+        sql_search_results = response.json()
+        #Li ho chiamati search_results anche se
+        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_search_results": sql_search_results})
     except requests.HTTPError as e:
         # Cattura l'errore HTTP e mostra un messaggio all'utente
         try:
