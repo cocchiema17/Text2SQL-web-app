@@ -44,8 +44,17 @@ class ConnectionManager:
 # ---------------------------------------------------------- QUERY ENDPOINT /search e /sql_search ---------------------------------------------------
 
     def clean_sql_output(self, response: str) -> str:
-        # Rimuove eventuali blocchi di testo prima/dopo la query
-        statements = sqlparse.split(response.strip())
+        # 1. Rimuove spazi iniziali e finali
+        response = response.strip()
+
+        # 2. Rimuove eventuali delimitatori Markdown (es. ```sql o ```)
+        if response.startswith("```sql") or response.startswith("```"):
+            response = re.sub(r"^```sql|^```|```$", "", response, flags=re.IGNORECASE).strip()
+
+        # 3. Divide il testo in uno o più statement SQL usando sqlparse
+        statements = sqlparse.split(response)
+
+        # 4. Restituisce il primo statement (pulito), se presente
         return statements[0].strip() if statements else ""
     
     

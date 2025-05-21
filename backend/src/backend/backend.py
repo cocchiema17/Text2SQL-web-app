@@ -27,8 +27,8 @@ mc.pull_model()
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
 @app.post("/search")
 def search(search_request: SearchRequest) -> SearchResponse:
-    if not search_request.question or not search_request.model:
-        raise HTTPException(status_code=400, detail="Both 'question' and 'model' fields are required.")
+    if not search_request.question:
+        raise HTTPException(status_code=422, detail="'question' is a necessary field.")
     
     cm: ConnectionManager = ConnectionManager()
     schema_summary: List[Tuple[str, str]] = cm.query_schema_summary()
