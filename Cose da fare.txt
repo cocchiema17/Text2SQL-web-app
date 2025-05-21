@@ -1,6 +1,6 @@
 Cose da fare:
 
- - in connection_manager.py, eliminare i markdown (delimitatori) dalla risposta del modello per ripulire la query generata
+ - in connection_manager.py (nella funzione clean_sql_output), eliminare i markdown (delimitatori) dalla risposta del modello per ripulire la query generata
 
  - modificare enpoint search (backend): 
 	- fare metodo in model_controller.py get_table_name, fare dizionario che mappa "nome tabella":"item_type" per ottenere item_type
