@@ -36,35 +36,44 @@ def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/search")
-def search(request: Request):
+def search(request: Request,question:str,model:str):
+    """
+        (fai il commento che ritieni più opportuno)
+    """
     pass
     
 
 @app.post("/sql_search")
-def sql_search(request: Request):
+def sql_search(request: Request, question = Form(...), model = Form(...)):
     """
         (fai il commento che ritieni più opportuno)
 
     """
+    data = {
+        "sql_query" : question,
+        "model": model
+    }
     try:
-        response = requests.post(f"{API_BASE_URL}/sql_search")
+        response = requests.post(f"{API_BASE_URL}/sql_search", json=data)
         response.raise_for_status()
         sql_search_results = response.json()
+        sql_validation = sql_search_results["sql_validation"]
+        results  = sql_search_results["results"]
         #Li ho chiamati search_results anche se
-        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_search_results": sql_search_results})
+        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_validation":sql_validation, "results":results })
     except requests.HTTPError as e:
         # Cattura l'errore HTTP e mostra un messaggio all'utente
         try:
             error_detail = response.json().get("detail", str(e))
         except Exception:
             error_detail = str(e)
-        return templates.TemplateResponse("index.html", {
+        return templates.TemplateResponse("sql_search.html", {
             "request": request,
-            "error": f"Errore nella ricerca: {error_detail}"
+            "error": f"Errore nella ricerca sql: {error_detail}"
         })
     except Exception as e:
         # Qualsiasi altro errore
-        return templates.TemplateResponse("index.html", {
+        return templates.TemplateResponse("sql_search.html", {
             "request": request,
             "error": f"Errore inatteso: {e}"
         })
