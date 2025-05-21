@@ -44,7 +44,7 @@ def search(search_request: SearchRequest) -> SearchResponse:
     question: str = search_request.question
     query: str = mc.ask_question(question, schema_summary)
     print(f"Query by model: {query}", flush=True)
-    query = cm.clean_query(query)
+    query = cm.clean_sql_output(query)
     print(f"Cleaned query: {query}", flush=True)
 
     # Verifica se la query è valida
@@ -99,15 +99,17 @@ def sql_search(search_request: SQLSearchRequest):
     
     query: str = search_request.sql_query
     
+    
     cm: ConnectionManager = ConnectionManager()
+    query = cm.clean_sql_output(query)
     # Verifica se la query è valida
     # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
-    sql_validation: str = cm.sql_validation(search_request.sql_query)
+    sql_validation: str = cm.sql_validation(query)
 
     # se la query è "valid" allora si esegue la query
     # fare metodo che esegue la query e restituisce i risultati
     if sql_validation == "valid":
-        results: Tuple[List[str], List[Tuple]] = cm.execute_query(search_request.sql_query)
+        results: Tuple[List[str], List[Tuple]] = cm.execute_query(query)
         columns: List[str] = results[0]
         data: List[Tuple[str, str, str]] = results[1]
         print("Columns from DB:", columns, flush=True)
