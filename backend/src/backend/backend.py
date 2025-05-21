@@ -81,10 +81,12 @@ def search(search_request: SearchRequest) -> SearchResponse:
     
     # se la query è "unsafe" allora si restituisce un errore
     elif sql_validation == "unsafe":
-        raise HTTPException(status_code=422, detail="Unsafe query. Please check your SQL syntax.")
+        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        return search_response
     # se la query è "invalid" allora si restituisce un errore
     elif sql_validation == "invalid":
-        raise HTTPException(status_code=422, detail="Invalid query. Please check your SQL syntax.")
+        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        return search_response
     else:
         raise HTTPException(status_code=422, detail="Unknown error. Please check your SQL syntax.")
     
