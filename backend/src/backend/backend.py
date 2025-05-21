@@ -93,18 +93,20 @@ def search(search_request: SearchRequest) -> SearchResponse:
 # ---------------------------------------------------------- ENDPOINT /sql_search ---------------------------------------------------
 
 @app.post("/sql_search")
-def sql_search(search_request: SQLSearchRequest):
-    if not search_request.sql_query and not search_request.model:
-        raise HTTPException(status_code=400, detail="Both 'question' and 'model' fields are required.")
+def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
+    if not search_request.sql_query:
+        raise HTTPException(status_code=422, detail="'question' is a necessary field.")
     
     query: str = search_request.sql_query
     
     
     cm: ConnectionManager = ConnectionManager()
     query = cm.clean_sql_output(query)
+    print(f"Cleaned query: {query}", flush=True)
     # Verifica se la query è valida
     # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
     sql_validation: str = cm.sql_validation(query)
+    print(f"SQL Validation: {sql_validation}", flush=True)
 
     # se la query è "valid" allora si esegue la query
     # fare metodo che esegue la query e restituisce i risultati
@@ -132,13 +134,15 @@ def sql_search(search_request: SQLSearchRequest):
             )
         return search_response
     
-     # se la query è "unsafe" allora si restituisce un errore
+     # se la query è "unsafe"
     elif sql_validation == "unsafe":
         search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        print(f"Response unsafe: {search_response}", flush=True)
         return search_response
-    # se la query è "invalid" allora si restituisce un errore
+    # se la query è "invalid"
     elif sql_validation == "invalid":
         search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        print(f"Response invalid: {search_response}", flush=True)
         return search_response
     else:
         raise HTTPException(status_code=422, detail="Unknown error. Please check your SQL syntax.")

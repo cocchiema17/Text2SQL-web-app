@@ -43,7 +43,7 @@ class ConnectionManager:
 
 # ---------------------------------------------------------- QUERY ENDPOINT /search e /sql_search ---------------------------------------------------
 
-    def clean_sql_output(response: str) -> str:
+    def clean_sql_output(self, response: str) -> str:
         # Rimuove eventuali blocchi di testo prima/dopo la query
         statements = sqlparse.split(response.strip())
         return statements[0].strip() if statements else ""
@@ -66,11 +66,8 @@ class ConnectionManager:
                     return "valid"
                 except mariadb.Error as e:
                     # Se la sintassi è errata, restituiamo "invalid"
-                    if "syntax error" in str(e):
-                        return "invalid"
-                    else:
-                        print(f"Error executing query: {e}")
-                        raise
+                    print(f"Error executing query: {e}")
+                    return "invalid"
                 finally:
                     self.close()
             else:

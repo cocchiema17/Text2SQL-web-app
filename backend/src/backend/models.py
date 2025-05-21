@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 """
 Questo file contiene i modelli di dati utilizzati nell'applicazione FastAPI.
@@ -23,19 +23,18 @@ class SearchRequest(BaseModel):
 class SearchResponse(BaseModel):
     sql: str
     sql_validation: str
-    results: List[SearchResult]
+    results: Optional[List[SearchResult]]
   
 
 # ---------------------------------------------------------- MODELLI ENDPOINT /sql_search ---------------------------------------------------
 
-#Aggiunta la classe per la sql_search()
 class SQLSearchRequest(BaseModel):
     sql_query: str
-    model: str
+    model: Optional[str] = None
 
 class SQLSearchResponse(BaseModel):
     sql_validation: str
-    results: SearchResult
+    results: Optional[List[SearchResult]]
 
 # ---------------------------------------------------------- MODELLI ENDPOINT /schema_summary ---------------------------------------------------
 
