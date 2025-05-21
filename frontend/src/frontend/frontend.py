@@ -36,31 +36,72 @@ def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/search")
-def search(request: Request,question:str,model:str):
+def search(request: Request, search_request: str = Form(...), model: str = Form(...)):
     """
         (fai il commento che ritieni più opportuno)
     """
-    pass
-    
+    print("Search request:", search_request, flush=True)
+    print("Model:", model, flush=True)
+    data: Dict[str, str] = {
+        "question" : search_request,
+        "model": model
+    }
+    try:
+        response = requests.post(f"{API_BASE_URL}/search", json=data)
+        response.raise_for_status()
+        search_results: Dict[str, str] = response.json()
+        sql: str = search_results["sql"]
+        sql_validation: str = search_results["sql_validation"]
+        results: str = search_results["results"]
+        print("SQL:", sql, flush=True)
+        print("SQL Validation:", sql_validation, flush=True)
+        print("Results:", results, flush=True)
+        return templates.TemplateResponse("search.html",{"request": request, "sql": sql, "sql_validation": sql_validation, "results": results })
+    except requests.HTTPError as e:
+        # Cattura l'errore HTTP e mostra un messaggio all'utente
+        try:
+            error_detail = response.json().get("detail", str(e))
+        except Exception:
+            error_detail = str(e)
+        return templates.TemplateResponse("search.html", {
+            "request": request,
+            "error": f"Errore nella ricerca: {error_detail}"
+        })
+    except Exception as e:
+        # Qualsiasi altro errore
+        return templates.TemplateResponse("search.html", {
+            "request": request,
+            "error": f"Errore inatteso: {e}"
+        })
+
+@app.get("/sql_search")
+def sql_search_page(request: Request):
+    """
+    Questa funzione serve per accedere alla pagina web sql_search.html da index.html.
+    """
+    return templates.TemplateResponse("sql_search.html", {"request": request})
 
 @app.post("/sql_search")
-def sql_search(request: Request, question = Form(...), model = Form(...)):
+def sql_search(request: Request, sql_query: str = Form(...), model: str = Form(...)):
     """
         (fai il commento che ritieni più opportuno)
 
     """
-    data = {
-        "sql_query" : question,
+    print("SQL Query:", sql_query, flush=True)
+    print("Model:", model, flush=True)
+    data: Dict[str, str] = {
+        "sql_query" : sql_query,
         "model": model
     }
     try:
         response = requests.post(f"{API_BASE_URL}/sql_search", json=data)
         response.raise_for_status()
-        sql_search_results = response.json()
-        sql_validation = sql_search_results["sql_validation"]
-        results  = sql_search_results["results"]
-        #Li ho chiamati search_results anche se
-        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_validation":sql_validation, "results":results })
+        sql_search_results: Dict[str, str] = response.json()
+        sql_validation: str = sql_search_results["sql_validation"]
+        results: str = sql_search_results["results"]
+        print("SQL Validation:", sql_validation, flush=True)
+        print("Results:", results, flush=True)
+        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_validation": sql_validation, "results": results })
     except requests.HTTPError as e:
         # Cattura l'errore HTTP e mostra un messaggio all'utente
         try:

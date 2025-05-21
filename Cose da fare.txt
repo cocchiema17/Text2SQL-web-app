@@ -1,11 +1,9 @@
 Cose da fare:
 
+ - in connection_manager.py, eliminare i markdown (delimitatori) dalla risposta del modello per ripulire la query generata
+
  - modificare enpoint search (backend): 
 	- fare metodo in model_controller.py get_table_name, fare dizionario che mappa "nome tabella":"item_type" per ottenere item_type
-	- fare lato frontend e modificare leggermente search.html
-
- - fare l'endpoint sql_search:
-	- fare lato frotend e fare pagina sql_search.html e aggiungere il link a index.html (e viceversa)
 
  - modificare model_controller.py:
 	- implementare il metodo get_table_name, dando al modello il prompt con lo schema del database, una query sql, chiedendogli qual è la tabella

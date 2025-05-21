@@ -10,11 +10,14 @@
         <p>Questa è la pagina principale.</p>
         <a href="/schema_summary">Schema del database</a>
         <br><br>
+        <a href="/sql_search">Esegui una query SQL</a>
+        <br><br>
         <a href="/add">Aggiungi un record al database</a>
         <br><br>
-        <form method="get" action="/search">
+        <form method="post" action="/search">
             <label for="search_request">Cerca:</label>
             <input type="text" id="search_request" name="search_request" placeholder="Cerca..." size="60" required>
+            <input type="hidden" name="model" value="gemma3:1b-it-qat">
             <button type="submit">Cerca</button>
         </form>
         {% if error %}

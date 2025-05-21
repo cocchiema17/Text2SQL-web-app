@@ -6,11 +6,19 @@
         <title>SQL_Search</title>
     </head>
     <body>
-        <h1>Ecco lo risposta</h1>
+        <h1>Ricerca SQL</h1>
 
-        {% if search_results %}
+        <form method="post" action="/sql_search">
+            <label for="sql_query">Inserisci la tua query SQL:</label>
+            <input type="text" id="sql_query" name="sql_query" size="80" required>
+            <input type="hidden" name="model" value="gemma3:1b-it-qat">
+            <button type="submit">Invia</button>
+        </form>
+
+        {% if results %}
+            <h2>Risultati della ricerca</h2>
             <ul>
-                {% for item in search_results %}
+                {% for item in results %}
                     <li>
                         <strong>{{ item.item_type }}</strong>:
                         <ul>
@@ -22,9 +30,18 @@
                 {% endfor %}
             </ul>
         {% else %}
-            {% if not error %}
+            {% if error %}
                 <p>Nessun risultato trovato.</p>
+                <p>Errore: {{ error }}</p>
             {% endif %}
+        {% endif %}
+
+        {% if sql_validation == "valid" %}
+            <p style="color: green;">La query SQL è valida.</p>
+        {% elif sql_validation == "unsafe" %}
+            <p style="color: rgba(255, 51, 0, 0.949);">La query SQL è potenzialmente pericolosa.</p>
+        {% elif sql_validation == "invalid" %}
+            <p style="color: red;">La query SQL non è valida.</p>
         {% endif %}
 
         <a href="/">Torna alla pagina principale</a>

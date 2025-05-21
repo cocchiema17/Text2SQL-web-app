@@ -8,9 +8,9 @@
     <body>
         <h1>Ecco lo risposta</h1>
 
-        {% if search_results %}
+        {% if results %}
             <ul>
-                {% for item in search_results %}
+                {% for item in results %}
                     <li>
                         <strong>{{ item.item_type }}</strong>:
                         <ul>
@@ -22,9 +22,20 @@
                 {% endfor %}
             </ul>
         {% else %}
-            {% if not error %}
+            {% if error %}
                 <p>Nessun risultato trovato.</p>
+                <p>Errore: {{ error }}</p>
             {% endif %}
+        {% endif %}
+
+        <p>Questa è la query generata dal modello: {{ sql }}</p>
+        
+        {% if sql_validation == "valid" %}
+            <p style="color: green;">La query SQL è valida.</p>
+        {% elif sql_validation == "unsafe" %}
+            <p style="color: rgba(255, 51, 0, 0.949);">La query SQL è potenzialmente pericolosa.</p>
+        {% elif sql_validation == "invalid" %}
+            <p style="color: red;">La query SQL non è valida.</p>
         {% endif %}
 
         <a href="/">Torna alla pagina principale</a>
