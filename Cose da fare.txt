@@ -2,9 +2,10 @@ Cose da fare:
 
  - modificare enpoint search (backend): 
 	- fare metodo in model_controller.py get_table_name, fare dizionario che mappa "nome tabella":"item_type" per ottenere item_type
+	- fare lato frontend e modificare leggermente search.html
 
  - fare l'endpoint sql_search:
-	- fare lato backend e poi lato frotend(nel lato frontend commenta te la funzione)
+	- fare lato frotend e fare pagina sql_search.html e aggiungere il link a index.html (e viceversa)
 
  - modificare model_controller.py:
 	- implementare il metodo get_table_name, dando al modello il prompt con lo schema del database, una query sql, chiedendogli qual è la tabella
@@ -14,15 +15,12 @@ Logica enpoint search e sql_search:
 -Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database
 -Risposta: database -> connection_manager (ritorna i risultati se sql_validation è valida) -> backend -> frontend -> utente
 
- - fare pagina sql_search.html e aggiungere il link a index.html (e viceversa)
-
- - modificare leggermente search.html
-
  -Aggiornare backend - fronted della search e sql_search:
-	-ristrutturare per la gestione degli item_type
+	-ristrutturare per la gestione degli item_type (chiedere al prof su classroom)
 
 - per ogni enpoint:
 	- aggiungere i controlli e gestire i casi di errore
 
-- mettere try/except negli endpoint search e sql_search per catturare gli errori, evitando l'errore 500.
-  Bisogna comunque restituire una risposta anche sql_validation non è "valid"
+- aggiungere commenti e verificare che il codice sia pulito
+
+- modificare report.pdf

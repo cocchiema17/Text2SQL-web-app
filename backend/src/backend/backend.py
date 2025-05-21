@@ -17,14 +17,6 @@ Questi sono gli endpoint principali:
 """
 
 app = FastAPI()
-# questa lista serve per il mesaggio di errore quando la search non è valida
-search_queries: List[str] = [
-    "Elenca i film del <ANNO>.",
-    "Quali sono i registi presenti su Netflix?",
-    "Elenca tutti i film di fantascienza.",
-    "Quali film sono stati fatti da un regista di almeno <ANNI> anni?",
-    "Quali registi hanno fatto più di un film?"
-]
 
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 
@@ -70,7 +62,8 @@ def search(search_request: SearchRequest) -> SearchResponse:
                 SearchResult(
                     item_type="film",   # o "director" o "platform" (da modificare)
                     properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
+                        Property(property_name="name" if columns[i] == "titolo" else columns[i],
+                                 property_value=str(row[i]))
                         for i in range(len(columns))
                     ]    
                 )
@@ -125,7 +118,8 @@ def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
             results= [SearchResult(
                     item_type="film",   # o "director" o "platform" (da modificare)
                     properties=[
-                        Property(property_name=columns[i], property_value=str(row[i]))
+                        Property(property_name="name" if columns[i] == "titolo" else columns[i],
+                                 property_value=str(row[i]))
                         for i in range(len(columns))
                     ]    
                 )
@@ -136,12 +130,12 @@ def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
     
      # se la query è "unsafe"
     elif sql_validation == "unsafe":
-        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        search_response: SQLSearchResponse = SQLSearchResponse(sql_validation=sql_validation, results=None)
         print(f"Response unsafe: {search_response}", flush=True)
         return search_response
     # se la query è "invalid"
     elif sql_validation == "invalid":
-        search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
+        search_response: SQLSearchResponse = SQLSearchResponse(sql_validation=sql_validation, results=None)
         print(f"Response invalid: {search_response}", flush=True)
         return search_response
     else:
