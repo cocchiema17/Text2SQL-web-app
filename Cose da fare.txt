@@ -26,5 +26,3 @@ Logica enpoint search e sql_search:
 
 - mettere try/except negli endpoint search e sql_search per catturare gli errori, evitando l'errore 500.
   Bisogna comunque restituire una risposta anche sql_validation non è "valid"
-
-- cambiare i nomi delle tabelle del database e correggere anche in altri punti che hanno a che fare con il database

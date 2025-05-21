@@ -25,43 +25,43 @@ def connect_db(retries=10, delay=3):
     
 def get_or_create_director(cursor, name, age):
     # Sto dando per scontato che il nome riconosca il regista, e che l'età sia un campo che può cambiare
-    cursor.execute("SELECT id, name, age FROM directors WHERE name = ?", [name])
+    cursor.execute("SELECT id, nome, eta FROM directors WHERE nome = ?", [name])
     director = cursor.fetchone()
     # Se il regista esiste, controlla se l'età è cambiata, e restituisci l'ID
     if director:
         # Se l'età è cambiata, aggiornala
         if director[2] < age:
-            cursor.execute("UPDATE directors SET age = ? WHERE id = ?", [age, director[0]])
+            cursor.execute("UPDATE directors SET eta = ? WHERE id = ?", [age, director[0]])
         return director[0]
     # Se il regista non esiste, crealo e restituisci l'ID
     else:
-        cursor.execute("INSERT INTO directors (name, age) VALUES (?, ?)", [name, age])
+        cursor.execute("INSERT INTO directors (nome, eta) VALUES (?, ?)", [name, age])
         return cursor.lastrowid
     
 def get_or_create_platform(cursor, name):
     # Sto dando per scontato che il nome riconosca la piattaforma
-    cursor.execute("SELECT id FROM platforms WHERE name = ?", [name])
+    cursor.execute("SELECT id FROM platforms WHERE nome = ?", [name])
     platform = cursor.fetchone()
     # Se la piattaforma esiste, restituisci l'ID
     if platform:
         return platform[0]
     # Se la piattaforma non esiste, creala e restituisci l'ID
     else:
-        cursor.execute("INSERT INTO platforms (name) VALUES (?)", [name])
+        cursor.execute("INSERT INTO platforms (nome) VALUES (?)", [name])
         return cursor.lastrowid
     
 def get_or_create_movie(cursor, title, year, genre, id_director, id_platform1, id_platform2):
     # Sto dando per scontato che il titolo riconosca il film, e che l'anno, il genere, il regista e le piattaforme siano campi che possono cambiare
-    cursor.execute("SELECT id, title, year, genre, id_director, id_platform1, id_platform2 FROM movies WHERE title = ?", [title])
+    cursor.execute("SELECT id, titolo, anno, genere, id_director, id_platform1, id_platform2 FROM movies WHERE titolo = ?", [title])
     movie = cursor.fetchone()
     # Se il film esiste, controlla se l'anno, il genere, il regista o le piattaforme sono cambiati e restituisci l'ID
     if movie:
         # Verifica se l'anno è cambiato
         if movie[2] != year:
-            cursor.execute("UPDATE movies SET year = ? WHERE id = ?", [year, movie[0]])
+            cursor.execute("UPDATE movies SET anno = ? WHERE id = ?", [year, movie[0]])
         # Verifica se il genere è cambiato
         if movie[3] != genre:
-            cursor.execute("UPDATE movies SET genre = ? WHERE id = ?", [genre, movie[0]])
+            cursor.execute("UPDATE movies SET genere = ? WHERE id = ?", [genre, movie[0]])
         # Verifica se il regista è cambiato
         if movie[4] != id_director:
             cursor.execute("UPDATE movies SET id_director = ? WHERE id = ?", [id_director, movie[0]])
@@ -74,7 +74,7 @@ def get_or_create_movie(cursor, title, year, genre, id_director, id_platform1, i
         return movie[0]
     # Se il film non esiste, crealo e restituisci l'ID
     else:
-        cursor.execute("INSERT INTO movies (title, year, genre, id_director, id_platform1, id_platform2) VALUES (?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO movies (titolo, anno, genere, id_director, id_platform1, id_platform2) VALUES (?, ?, ?, ?, ?, ?)",
                        [title, year, genre, id_director, id_platform1, id_platform2])
         return cursor.lastrowid
     

@@ -136,16 +136,16 @@ class ConnectionManager:
         self.connect()
         if self.connection and self.cursor:
             try:
-                self.cursor.execute("SELECT id, name, age FROM directors WHERE name = ?", [name])
+                self.cursor.execute("SELECT id, nome, eta FROM directors WHERE nome = ?", [name])
                 director = self.cursor.fetchone()
                 if director:
                     # Se l'età è cambiata, la aggiorna
                     if director[2] < age:
-                        self.cursor.execute("UPDATE directors SET age = ? WHERE id = ?", [age, director[0]])
+                        self.cursor.execute("UPDATE directors SET eta = ? WHERE id = ?", [age, director[0]])
                         self.connection.commit()
                     return director[0]
                 else:
-                    self.cursor.execute("INSERT INTO directors (name, age) VALUES (?, ?)", [name, age])
+                    self.cursor.execute("INSERT INTO directors (nome, eta) VALUES (?, ?)", [name, age])
                     self.connection.commit()
                     return self.cursor.lastrowid
             except mariadb.Error as e:
@@ -167,12 +167,12 @@ class ConnectionManager:
         self.connect()
         if self.connection and self.cursor:
             try:
-                self.cursor.execute("SELECT id FROM platforms WHERE name = ?", [name])
+                self.cursor.execute("SELECT id FROM platforms WHERE nome = ?", [name])
                 platform = self.cursor.fetchone()
                 if platform:
                     return platform[0]
                 else:
-                    self.cursor.execute("INSERT INTO platforms (name) VALUES (?)", [name])
+                    self.cursor.execute("INSERT INTO platforms (nome) VALUES (?)", [name])
                     self.connection.commit()
                     return self.cursor.lastrowid
             except mariadb.Error as e:
@@ -193,16 +193,16 @@ class ConnectionManager:
         self.connect()
         if self.connection and self.cursor:
             try:
-                self.cursor.execute("SELECT id, title, year, genre, id_director, id_platform1, id_platform2 FROM movies WHERE title = ?", [title])
+                self.cursor.execute("SELECT id, titolo, anno, genere, id_director, id_platform1, id_platform2 FROM movies WHERE titolo = ?", [title])
                 movie = self.cursor.fetchone()
                 # Se il film esiste, controlla se l'anno, il genere, il regista o le piattaforme sono cambiati e restituisci l'ID
                 if movie:
                     # Verifica se l'anno è cambiato
                     if movie[2] != year:
-                        self.cursor.execute("UPDATE movies SET year = ? WHERE id = ?", [year, movie[0]])
+                        self.cursor.execute("UPDATE movies SET anno = ? WHERE id = ?", [year, movie[0]])
                     # Verifica se il genere è cambiato
                     if movie[3] != genre:
-                        self.cursor.execute("UPDATE movies SET genre = ? WHERE id = ?", [genre, movie[0]])
+                        self.cursor.execute("UPDATE movies SET genere = ? WHERE id = ?", [genre, movie[0]])
                     # Verifica se il regista è cambiato
                     if movie[4] != id_director:
                         self.cursor.execute("UPDATE movies SET id_director = ? WHERE id = ?", [id_director, movie[0]])
@@ -215,7 +215,7 @@ class ConnectionManager:
                     self.connection.commit()
                     return movie[0]
                 else:
-                    self.cursor.execute("INSERT INTO movies (title, year, genre, id_director, id_platform1, id_platform2) VALUES (?, ?, ?, ?, ?, ?)",
+                    self.cursor.execute("INSERT INTO movies (titolo, anno, genere, id_director, id_platform1, id_platform2) VALUES (?, ?, ?, ?, ?, ?)",
                                        [title, year, genre, id_director, id_platform1, id_platform2])
                     self.connection.commit()
                     return self.cursor.lastrowid

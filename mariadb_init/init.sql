@@ -6,20 +6,20 @@ use movie_catalog;
 
 create table if not exists directors (
     id int auto_increment primary key,
-    name varchar(255) not null unique,
-    age int not null
+    nome varchar(255) not null unique,
+    eta int not null
 );
 
 create table if not exists platforms (
     id int auto_increment primary key,
-    name varchar(255) not null unique
+    nome varchar(255) not null unique
 );
 
 create table if not exists movies (
     id int auto_increment primary key,
-    title varchar(255) not null unique,
-    year int not null,
-    genre varchar(255) not null,
+    titolo varchar(255) not null unique,
+    anno int not null,
+    genere varchar(255) not null,
     id_director int not null,
     id_platform1 int,
     id_platform2 int,
