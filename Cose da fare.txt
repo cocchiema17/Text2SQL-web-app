@@ -1,7 +1,5 @@
 Cose da fare:
 
- - rivedere sql_validation
-
  - modificare enpoint search (backend): 
 	- fare metodo in model_controller.py get_table_name, fare dizionario che mappa "nome tabella":"item_type" per ottenere item_type
 
