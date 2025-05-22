@@ -66,23 +66,25 @@ class ConnectionManager:
                     "invalid" se la sintassi è errata.
         """
         self.connect()
-        if self.connection and self.cursor:
-            #  una regex per controllare se la query inizia con SELECT, ignorando spazi e commenti.
-            if re.match(r'^\s*select\b', sql_query, re.IGNORECASE):
-                try:
-                    # Eseguiamo la query per validare la sintassi SQL
-                    self.cursor.execute(sql_query)
-                    return "valid"
-                except mariadb.Error as e:
-                    # Se la sintassi è errata, restituiamo "invalid"
-                    print(f"Error executing query: {e}")
+        try:
+            if self.connection and self.cursor:
+                if re.match(r'^\s*select\b', sql_query, re.IGNORECASE):
+                    try:
+                        self.cursor.execute(sql_query)
+                        return "valid"
+                    except mariadb.Error as e:
+                        print(f"Error executing query: {e}", flush=True)
+                        return "invalid"
+                elif re.match(r'^\s*(insert|update|delete|drop|create|alter)\b', sql_query, re.IGNORECASE):
+                    # Se la query contiene comandi di modifica, restituisce "unsafe"
+                    return "unsafe"
+                else:
                     return "invalid"
-                finally:
-                    self.close()
             else:
-                # Se la query non è una SELECT, restituiamo "unsafe"
-                self.close()
-                return "unsafe"
+                print("Connection not established.")
+                raise Exception("Connection not established.")
+        finally:
+            self.close()
 
             
     def execute_query(self, sql_query: str) -> Tuple[List[str], List[Tuple]]:
