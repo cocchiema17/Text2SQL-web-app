@@ -30,7 +30,9 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Nessun risultato trovato.</p>
+            {% if not isfirst_time %}
+                <p>Nessun risultato trovato.</p>
+            {% endif %}
             {% if error %}
                 <p>Errore: {{ error }}</p>
             {% endif %}

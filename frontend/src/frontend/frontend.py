@@ -79,7 +79,8 @@ def sql_search_page(request: Request):
     """
     Questa funzione serve per accedere alla pagina web sql_search.html da index.html.
     """
-    return templates.TemplateResponse("sql_search.html", {"request": request})
+    isfirst_time: bool = True
+    return templates.TemplateResponse("sql_search.html", {"request": request, "isfirst_time": isfirst_time})
 
 @app.post("/sql_search")
 def sql_search(request: Request, sql_query: str = Form(...), model: str = Form(...)):
@@ -101,7 +102,7 @@ def sql_search(request: Request, sql_query: str = Form(...), model: str = Form(.
         results: str = sql_search_results["results"]
         print("SQL Validation:", sql_validation, flush=True)
         print("Results:", results, flush=True)
-        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_validation": sql_validation, "results": results })
+        return templates.TemplateResponse("sql_search.html",{"request": request, "sql_validation": sql_validation, "results": results, "isfirst_time": False})
     except requests.HTTPError as e:
         # Cattura l'errore HTTP e mostra un messaggio all'utente
         try:
