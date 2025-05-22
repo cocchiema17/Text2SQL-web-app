@@ -99,7 +99,7 @@ def main():
                 platform2 = row[6].strip() if len(row) > 6 else None
 
                 id_director = get_or_create_director(cursor, director, director_age)
-                id_platform1 = get_or_create_platform(cursor, platform1)
+                id_platform1 = get_or_create_platform(cursor, platform1) if platform1 else None
                 id_platform2 = get_or_create_platform(cursor, platform2) if platform2 else None
 
                 get_or_create_movie(cursor, title, year, genre, id_director, id_platform1, id_platform2)
