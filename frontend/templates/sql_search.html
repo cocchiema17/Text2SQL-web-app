@@ -30,8 +30,8 @@
                 {% endfor %}
             </ul>
         {% else %}
+            <p>Nessun risultato trovato.</p>
             {% if error %}
-                <p>Nessun risultato trovato.</p>
                 <p>Errore: {{ error }}</p>
             {% endif %}
         {% endif %}
