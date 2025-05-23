@@ -16,8 +16,6 @@ Cose da fare:
 
 - aggiungere commenti e verificare che il codice sia pulito
 
-- migliorare l'interfaccia grafica
-
 Logica enpoint search e sql_search:
 -Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database
 -Risposta: database -> connection_manager (ritorna i risultati se sql_validation è valida) -> backend -> frontend -> utente

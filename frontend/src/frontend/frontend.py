@@ -4,7 +4,7 @@ import requests
 from pathlib import Path
 import re
 from re import Match
-from typing import Dict
+from typing import Dict, List
 import os
 
 """
@@ -134,7 +134,15 @@ def schema_summary(request: Request):
     try:
         response = requests.get(f"{API_BASE_URL}/schema_summary")
         response.raise_for_status()
-        schema_summary = response.json()
+        schema_summary_response: List[Dict[str, str]] = response.json()
+        schema_summary: Dict[str, List[str]] = {}
+        for item in schema_summary_response:
+            table_name: str = item["table_name"]
+            table_column: str = item["table_column"]
+            if table_name not in schema_summary:
+                schema_summary[table_name] = []
+            schema_summary[table_name].append(table_column)
+        print("Schema Summary:", schema_summary, flush=True)
         return templates.TemplateResponse("schema_summary.html", {"request": request, "schema_summary": schema_summary})
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error fetching schema summary: {e}")
