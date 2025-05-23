@@ -14,7 +14,7 @@ Cose da fare:
 
 - testare tanto gli endpoint search e sql_search per cercare errori (IMPORTANTE)
 
-- aggiungere commenti e verificare che il codice sia pulito
+- aggiungere commenti e verificare che il codice sia pulito (quasi finito, manca da aggiornare fronted.py e commentare model_controller.py)
 
 Logica enpoint search e sql_search:
 -Richiesta: -> stringa -> backend -> model_controller -> SQL -> connection_manager (fare metodo per la validazione) -> database

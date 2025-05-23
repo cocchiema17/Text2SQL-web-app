@@ -1,6 +1,5 @@
 import requests
 from models import Question, ModelRequest, ModelResponse, ModelPullRequest
-from connection_manager import ConnectionManager
 from typing import List, Tuple
 
 class ModelController:

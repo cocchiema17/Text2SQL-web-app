@@ -8,10 +8,11 @@ import os
 from model_controller import ModelController
 
 """
-Questo file contiene il codice del server backend FastAPI che gestisce le richieste HTTP e l''interazione con il database attraverso la 
-classe ConnectionManager.
+Questo file contiene il codice del server backend FastAPI che gestisce le richieste HTTP, l'interazione con il database attraverso la 
+classe ConnectionManager e gestisce e comunica con il modello di IA di Ollama attraverso la classe ModelController.
 Questi sono gli endpoint principali:
-1. /search/{search_request}: per cercare film o registi in base a una query specifica.
+1. /search: richiedere informazioni sui film, registi e piattaforme.
+2. /sql_search: per eseguire query SQL dirette sul database.
 2. /schema_summary: per ottenere lo schema del database, ovvero i nomi delle tabelle e le colonne di ogni tabella.
 3. /add: per aggiungere un nuovo film al database.
 """
@@ -28,6 +29,11 @@ mc.pull_model()
 
 @app.post("/search")
 def search(search_request: SearchRequest) -> SearchResponse:
+    """
+    Questo metodo prende in input una stringa di ricerca e la passa al modello di IA per generare una query SQL.
+    Se la query è valida, viene eseguita sul database e restituisce i risultati.
+    Se la query è "unsafe" o "invalid", lo segnala.
+    """
     if not search_request.question:
         raise HTTPException(status_code=422, detail="'question' is a necessary field.")
     
@@ -40,12 +46,9 @@ def search(search_request: SearchRequest) -> SearchResponse:
     query = cm.clean_sql_output(query)
     print(f"Cleaned query: {query}", flush=True)
 
-    # Verifica se la query è valida
-    # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
     sql_validation: str = cm.sql_validation(query)
 
     # se la query è "valid" allora si esegue la query
-    # fare metodo che esegue la query e restituisce i risultati
     if sql_validation == "valid":
         results: Tuple[List[str], List[Tuple]] = cm.execute_query(query)
         columns: List[str] = results[0]
@@ -73,11 +76,11 @@ def search(search_request: SearchRequest) -> SearchResponse:
             )
         return search_response
     
-    # se la query è "unsafe" allora si restituisce un errore
+    # se la query è "unsafe"
     elif sql_validation == "unsafe":
         search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
         return search_response
-    # se la query è "invalid" allora si restituisce un errore
+    # se la query è "invalid"
     elif sql_validation == "invalid":
         search_response: SearchResponse = SearchResponse(sql=query, sql_validation=sql_validation, results=None)
         return search_response
@@ -88,8 +91,13 @@ def search(search_request: SearchRequest) -> SearchResponse:
 
 @app.post("/sql_search")
 def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
+    """
+    Questo metodo prende in input una stringa che rappresenta una query SQL e la passa alla classe ConnectionManager per eseguire la query sul database.
+    Se la query è valida, viene eseguita sul database e restituisce i risultati.
+    Se la query è "unsafe" o "invalid", lo segnala.
+    """
     if not search_request.sql_query:
-        raise HTTPException(status_code=422, detail="'question' is a necessary field.")
+        raise HTTPException(status_code=422, detail="'sql_query' is a necessary field.")
     
     query: str = search_request.sql_query
     
@@ -97,13 +105,11 @@ def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
     cm: ConnectionManager = ConnectionManager()
     query = cm.clean_sql_output(query)
     print(f"Cleaned query: {query}", flush=True)
-    # Verifica se la query è valida
-    # fare metodo che prende in input una stringa (una query) e controlla se è "valid", "unsafe" o "invalid" all'interno della classe ConnectionManager
+   
     sql_validation: str = cm.sql_validation(query)
     print(f"SQL Validation: {sql_validation}", flush=True)
 
     # se la query è "valid" allora si esegue la query
-    # fare metodo che esegue la query e restituisce i risultati
     if sql_validation == "valid":
         results: Tuple[List[str], List[Tuple]] = cm.execute_query(query)
         columns: List[str] = results[0]

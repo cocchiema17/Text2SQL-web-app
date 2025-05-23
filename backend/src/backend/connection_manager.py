@@ -44,17 +44,18 @@ class ConnectionManager:
 # ---------------------------------------------------------- QUERY ENDPOINT /search e /sql_search ---------------------------------------------------
 
     def clean_sql_output(self, response: str) -> str:
-        # 1. Rimuove spazi iniziali e finali
+        """
+        Questo metodo pulisce l'output SQL rimuovendo spazi iniziali e finali, delimitatori Markdown e dividendo in statement SQL.
+        Restituisce il primo statement SQL pulito.
+        """
         response = response.strip()
 
-        # 2. Rimuove eventuali delimitatori Markdown (es. ```sql o ```)
+        # Rimuove eventuali delimitatori Markdown (es. ```sql o ```)
         if response.startswith("```sql") or response.startswith("```"):
             response = re.sub(r"^```sql|^```|```$", "", response, flags=re.IGNORECASE).strip()
 
-        # 3. Divide il testo in uno o più statement SQL usando sqlparse
+        # Divide il testo in uno o più statement SQL usando sqlparse e restituisce il primo statement pulito
         statements = sqlparse.split(response)
-
-        # 4. Restituisce il primo statement (pulito), se presente
         return statements[0].strip() if statements else ""
     
     
@@ -76,7 +77,6 @@ class ConnectionManager:
                         print(f"Error executing query: {e}", flush=True)
                         return "invalid"
                 elif re.match(r'^\s*(insert|update|delete|drop|create|alter)\b', sql_query, re.IGNORECASE):
-                    # Se la query contiene comandi di modifica, restituisce "unsafe"
                     return "unsafe"
                 else:
                     return "invalid"
