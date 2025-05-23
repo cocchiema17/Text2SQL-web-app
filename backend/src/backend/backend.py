@@ -25,6 +25,7 @@ mc: ModelController = ModelController(OLLAMA_API_URL)
 mc.pull_model()
 
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
+
 @app.post("/search")
 def search(search_request: SearchRequest) -> SearchResponse:
     if not search_request.question:

@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.templating import Jinja2Templates
 import requests
 from pathlib import Path
-import urllib.parse
 import re
 from re import Match
 from typing import Dict
@@ -34,6 +33,8 @@ def index(request: Request):
     Questa funzione restituisce la pagina principale dell'applicazione dove l'utente può accedere alle varie funzionalità.
     """
     return templates.TemplateResponse("index.html", {"request": request})
+
+# ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
 
 @app.post("/search")
 def search(request: Request, search_request: str = Form(...), model: str = Form(...)):
@@ -73,6 +74,8 @@ def search(request: Request, search_request: str = Form(...), model: str = Form(
             "request": request,
             "error": f"Errore inatteso: {e}"
         })
+    
+# ---------------------------------------------------------- ENDPOINT /sql_search ---------------------------------------------------
 
 @app.get("/sql_search")
 def sql_search_page(request: Request):
@@ -120,6 +123,8 @@ def sql_search(request: Request, sql_query: str = Form(...), model: str = Form(.
             "error": f"Errore inatteso: {e}"
         })
 
+# ---------------------------------------------------------- ENDPOINT /schema_summary ---------------------------------------------------
+
 @app.get("/schema_summary")
 def schema_summary(request: Request):
     """
@@ -134,6 +139,7 @@ def schema_summary(request: Request):
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Error fetching schema summary: {e}")
 
+# ---------------------------------------------------------- ENDPOINT /add ---------------------------------------------------
 
 @app.get("/add")
 def add_page(request: Request):
