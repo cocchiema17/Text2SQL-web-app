@@ -10,16 +10,13 @@ import os
 """
 Questo file contiene il codice del server frontend FastAPI che gestisce le richieste HTTP e le pagine web.
 Questi sono gli endpoint principali:
-1. /search/{search_request}: per cercare film o registi in base a una query specifica.
-2. /schema_summary: per ottenere lo schema del database, ovvero i nomi delle tabelle e le colonne di ogni tabella.
-3. /add: per aggiungere un nuovo film al database.
+1. /search: per fare una ricerca nel database utilizzando una domanda in linguaggio naturale.
+2. /sql_search: per eseguire una query SQL direttamente sul database.
+3. /schema_summary: per ottenere lo schema del database, ovvero i nomi delle tabelle e le colonne di ogni tabella.
+4. /add: per aggiungere un nuovo film al database.
 """
 
 app = FastAPI()
-
-# Funziona solo in locale 
-#BASE_DIR = Path(__file__).resolve().parent.parent.parent
-#templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 # Funziona in docker
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
@@ -39,7 +36,8 @@ def index(request: Request):
 @app.post("/search")
 def search(request: Request, search_request: str = Form(...), model: str = Form(...)):
     """
-        (fai il commento che ritieni più opportuno)
+    Questa funzione gestisce la richiesta di ricerca nel database.
+    Prende in input una domanda in linguaggio naturale e un modello, chiama l'API per ottenere i risultati della ricerca
     """
     print("Search request:", search_request, flush=True)
     print("Model:", model, flush=True)
@@ -88,8 +86,8 @@ def sql_search_page(request: Request):
 @app.post("/sql_search")
 def sql_search(request: Request, sql_query: str = Form(...), model: str = Form(...)):
     """
-        (fai il commento che ritieni più opportuno)
-
+    Questa funzione gestisce la richiesta per eseguire una query SQL sul database.
+    Prende in input una query SQL e un modello, chiama l'API per ottenere i risultati della ricerca.
     """
     print("SQL Query:", sql_query, flush=True)
     print("Model:", model, flush=True)

@@ -3,6 +3,10 @@ import mariadb
 import os
 import time
 
+"""
+Questo script carica i dati da un file TSV in un database MariaDB all'avvio dell'applicazione, segue la stessa logica dell'endpoint /add.
+"""
+
 # Configurazione connessione a MariaDB
 db_config = {
     "user": os.getenv("MARIADB_USER", "root"),

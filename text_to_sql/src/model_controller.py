@@ -2,6 +2,11 @@ import requests
 from models import Question, ModelRequest, ModelResponse, ModelPullRequest
 from typing import List, Tuple
 
+"""
+Questo file contiene la classe ModelController che gestisce l'interazione con il modello di intelligenza artificiale.
+La classe consente di caricare un modello specifico e di inviare domande al modello per ottenere risposte in formato SQL.
+"""
+
 class ModelController:
     def __init__(self, api_url: str):
         self.api_url: str = api_url
@@ -9,6 +14,10 @@ class ModelController:
         self.is_model_loaded: bool = False 
 
     def pull_model(self) -> bool:
+        """
+        Questa funzione invia una richiesta al server per caricare il modello specificato.
+        Restituisce True se il modello è stato caricato con successo, altrimenti False.
+        """
         print(f"Pulling model {self.model} from {self.api_url}", flush=True)
         try:
             response = requests.post(f"{self.api_url}/api/pull", json=ModelPullRequest(model=self.model).model_dump())
@@ -25,6 +34,12 @@ class ModelController:
             return False
 
     def ask_question(self, question: str, schema_summary: List[Tuple[str, str]]) -> str:
+        """
+        Questa funzione invia una domanda al modello e restituisce la risposta in formato SQL.
+        Prende in input una domanda in linguaggio naturale e lo schema del database.
+        Prepara una richiesta al modello per far si che quest'ultimo generi una query SQL.
+        Restituisce la query SQL generata dal modello.
+        """
         print(f"Received question from backend: {question}", flush=True)
         print(f"Schema summary: {schema_summary}", flush=True)
 

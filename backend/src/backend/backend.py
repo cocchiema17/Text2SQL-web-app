@@ -13,8 +13,8 @@ classe ConnectionManager e gestisce e comunica con il modello di IA di Ollama at
 Questi sono gli endpoint principali:
 1. /search: richiedere informazioni sui film, registi e piattaforme.
 2. /sql_search: per eseguire query SQL dirette sul database.
-2. /schema_summary: per ottenere lo schema del database, ovvero i nomi delle tabelle e le colonne di ogni tabella.
-3. /add: per aggiungere un nuovo film al database.
+3. /schema_summary: per ottenere lo schema del database, ovvero i nomi delle tabelle e le colonne di ogni tabella.
+4. /add: per aggiungere un nuovo film al database.
 """
 
 app = FastAPI()
@@ -23,7 +23,9 @@ OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 
 mc: ModelController = ModelController(OLLAMA_API_URL)
 # All'inizio del server, il modello viene caricato
-mc.pull_model()
+is_model_loaded: bool = mc.pull_model()
+if not is_model_loaded:
+    raise HTTPException(status_code=500, detail="Failed to load the model. Please check the OLLAMA API URL or the model name.")
 
 # ---------------------------------------------------------- ENDPOINT /search ---------------------------------------------------
 
