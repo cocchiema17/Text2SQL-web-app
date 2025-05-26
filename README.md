@@ -31,7 +31,7 @@ Il progetto integra FastAPI, MariaDB e un modello LLM locale tramite [Ollama](ht
    http://127.0.0.1:8004
    ```
    
-🌐 **Funzionalità principali**
+## 🌐 **Funzionalità principali**
 
 🔍 /search – Inserisci una domanda in italiano (es. "Quali film del 2020?"):
 → il backend comunica con Ollama per generare una query SQL, esegue la query e restituisce i risultati.
