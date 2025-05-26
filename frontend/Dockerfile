@@ -2,9 +2,6 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Installa dipendenze di sistema necessarie per mariadb client
-RUN apt-get update && apt-get install -y gcc g++ libmariadb-dev
-
 COPY src/frontend /app
 COPY templates /app/templates
 COPY requirements.txt /app
