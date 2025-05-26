@@ -58,15 +58,12 @@ def search(search_request: SearchRequest) -> SearchResponse:
         print("Columns from DB:", columns, flush=True)
         print("Data from DB:", data, flush=True)
 
-    # fare metodo che restituisce il tipo di oggetto (film, regista o piattaforma) in base alla query
-    # item_type: str = cm.get_item_type(query) 
-
         search_response: SearchResponse = SearchResponse(
             sql=query,
             sql_validation=sql_validation,
             results= [
                 SearchResult(
-                    item_type="film",   # o "director" o "platform" (da modificare)
+                    item_type="film",
                     properties=[
                         Property(property_name="name" if columns[i] == "titolo" else columns[i],
                                  property_value=str(row[i]))
@@ -119,13 +116,10 @@ def sql_search(search_request: SQLSearchRequest) -> SQLSearchResponse:
         print("Columns from DB:", columns, flush=True)
         print("Data from DB:", data, flush=True)
 
-    # fare metodo che restituisce il tipo di oggetto (film, regista o piattaforma) in base alla query
-    # item_type: str = cm.get_item_type(query) 
-
         search_response: SQLSearchResponse = SQLSearchResponse(
             sql_validation=sql_validation,
             results= [SearchResult(
-                    item_type="film",   # o "director" o "platform" (da modificare)
+                    item_type="film",
                     properties=[
                         Property(property_name="name" if columns[i] == "titolo" else columns[i],
                                  property_value=str(row[i]))
